@@ -23,9 +23,9 @@ st.write(OPENAI_API_KEY)
 st.write("Connect your Database")
 #user_question = st.text_input("Ask a question about your PDF:")
 
-# db =  SQLDatabase.from_uri(
-#     "mysql+pymysql://bakewish:EmtTSRwDeKOk@admin.bakewish.in/bakewish_030123",
-#     )
+db =  SQLDatabase.from_uri(
+    "mysql+pymysql://bakewish:EmtTSRwDeKOk@admin.bakewish.in/bakewish_030123",
+    )
 st.write("db connection established")
 # Create a cursor object to execute SQL commands
 #st.write(db)
