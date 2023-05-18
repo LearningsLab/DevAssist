@@ -21,11 +21,36 @@ openai.api_key=OPENAI_API_KEY
 
 st.write(OPENAI_API_KEY)
 st.write("Connect your Database")
-#user_question = st.text_input("Ask a question about your PDF:")
 
+            
 db =  SQLDatabase.from_uri(
     "mysql+pymysql://bakewish:EmtTSRwDeKOk@admin.bakewish.in/bakewish_030123",
     )
+# db =  SQLDatabase.from_uri(
+#     "mysql+pymysql://vikram:password@localhost/bank",
+#     )
 st.write("db connection established")
 # Create a cursor object to execute SQL commands
-#st.write(db)
+# setup llm
+llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
+
+# Create db chain
+
+QUERY = """
+Given an input question, first create a syntactically correct postgresql query to run, then look at the results of the query and return the answer.
+Use the following format:
+
+Question: "Question here"
+SQLQuery: "SQL Query to run"
+SQLResult: "Result of the SQLQuery"
+Answer: "Final answer here"
+
+"""
+
+# Setup the database chain
+db_chain = SQLDatabaseChain(llm=llm, database=db, verbose=True)
+
+user_question = st.text_input("write a query:")
+
+#question = QUERY.format(question=user_question)
+st.write(db_chain.run(user_question))
