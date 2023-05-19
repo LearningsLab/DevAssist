@@ -18,19 +18,40 @@ st.header("Ask your Database and get Insights!! 💬")
 OPENAI_API_KEY = os.getenv("openai_key")
 openai.api_key=OPENAI_API_KEY
 
+conn = ''
 
-st.write(OPENAI_API_KEY)
-st.write("Connect your Database")
+with st.form("my_form"):
+   st.write("Inside the form")
+   db_type    = st.text_input("select db type")
+   dbusername = st.text_input("select db username")
+   dbpassword = st.text_input("select db password")
+   dbname     = st.text_input("select db name")
+   dbhost     = st.text_input("select db host")
 
-            
-db =  SQLDatabase.from_uri(
-    "mysql+pymysql://bakewish:EmtTSRwDeKOk@admin.bakewish.in/bakewish_030123",
-    )
+   # Every form must have a submit button.
+   submitted = st.form_submit_button("Submit")
+   if submitted:
+        if db_type=='mysql':
+            conn = "mysql+pymysql://"+dbusername+":"+dbpassword+"@"+dbhost+"/"+dbname
+
+st.write("Outside the form")
+
+
+
+
+
+st.write(conn)
 # db =  SQLDatabase.from_uri(
-#     "mysql+pymysql://vikram:password@localhost/bank",
+#     "mysql+pymysql://bakewish:EmtTSRwDeKOk@admin.bakewish.in/bakewish_030123",
 #     )
+if conn!='':
+    db =  SQLDatabase.from_uri(
+        conn,
+        )
+    
 st.write("db connection established")
-# Create a cursor object to execute SQL commands
+#st.write(db)
+
 # setup llm
 llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
 
@@ -52,5 +73,4 @@ db_chain = SQLDatabaseChain(llm=llm, database=db, verbose=True)
 
 user_question = st.text_input("write a query:")
 
-#question = QUERY.format(question=user_question)
 st.write(db_chain.run(user_question))
