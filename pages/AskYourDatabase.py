@@ -8,7 +8,7 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain import OpenAI, SQLDatabase, SQLDatabaseChain
-import psycopg2
+#import psycopg2
 import openai
 import os
 
@@ -44,29 +44,19 @@ with st.form("my_form"):
             db =  SQLDatabase.from_uri(
                 conn,
                 )
+
             # setup llm
             llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
 
 
-            # Create db chain
-
-            QUERY = """
-            Given an input question, first create a syntactically correct postgresql query to run, then look at the results of the query and return the answer.
-            Use the following format:
-
-            Question: "Question here"
-            SQLQuery: "SQL Query to run"
-            SQLResult: "Result of the SQLQuery"
-            Answer: "Final answer here"
-
-            """
             # Setup the database chain
             db_chain = SQLDatabaseChain(llm=llm, database=db, verbose=True)
 
             user_question = st.text_input("write a query:")
-
-            st.write(db_chain.run(user_question))
+            if user_question!='':
+                st.write(db_chain.run(user_question))
 
 st.write("Outside the form")
+   
 
 #st.write(db)
