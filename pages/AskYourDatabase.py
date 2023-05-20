@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import chunk
 import streamlit as st
 from langchain.text_splitter import CharacterTextSplitter
@@ -12,10 +12,11 @@ import psycopg2
 import openai
 import os
 
-load_dotenv()
+#load_dotenv()
 st.set_page_config(page_title="Ask your Database")
 st.header("Ask your Database and get Insights!! 💬")
-OPENAI_API_KEY = os.getenv("openai_key")
+OPENAI_API_KEY = os.getenv('openai_key')
+print (OPENAI_API_KEY)
 openai.api_key=OPENAI_API_KEY
 
 conn = ''
