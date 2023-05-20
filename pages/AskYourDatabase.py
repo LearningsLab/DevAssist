@@ -8,7 +8,7 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain import OpenAI, SQLDatabase, SQLDatabaseChain
-#import psycopg2
+import psycopg2
 import openai
 import os
 
