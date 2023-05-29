@@ -1,4 +1,4 @@
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 import chunk
 import streamlit as st
 from langchain.text_splitter import CharacterTextSplitter
@@ -12,11 +12,10 @@ import psycopg2
 import openai
 import os
 
-#load_dotenv()
+load_dotenv()
 st.set_page_config(page_title="Ask your Database")
 st.header("Ask your Database and get Insights!! 💬")
 OPENAI_API_KEY = os.getenv('openai_key')
-print (OPENAI_API_KEY)
 openai.api_key=OPENAI_API_KEY
 
 conn = ''
@@ -45,29 +44,19 @@ with st.form("my_form"):
             db =  SQLDatabase.from_uri(
                 conn,
                 )
+
             # setup llm
             llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
 
 
-            # Create db chain
-
-            QUERY = """
-            Given an input question, first create a syntactically correct postgresql query to run, then look at the results of the query and return the answer.
-            Use the following format:
-
-            Question: "Question here"
-            SQLQuery: "SQL Query to run"
-            SQLResult: "Result of the SQLQuery"
-            Answer: "Final answer here"
-
-            """
             # Setup the database chain
             db_chain = SQLDatabaseChain(llm=llm, database=db, verbose=True)
 
             user_question = st.text_input("write a query:")
-
-            st.write(db_chain.run(user_question))
+            if user_question!='':
+                st.write(db_chain.run(user_question))
 
 st.write("Outside the form")
+   
 
 #st.write(db)
