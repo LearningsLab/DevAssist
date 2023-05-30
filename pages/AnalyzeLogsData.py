@@ -27,8 +27,8 @@ tab1, tab2, tab3 = st.tabs(["Cloudwatch", "OpenSearch", "ElasticSearch"])
 with tab1:
    import boto3
    # Configure AWS credentials and region
-   aws_access_key_id = "AKIAUTH5FOVEGBBWCJT4"
-   aws_secret_access_key = "NvrskYQGzrUyqiRAP0//LGMffnLck/11t14FrWXB"
+   aws_access_key_id = ""
+   aws_secret_access_key = ""
    region_name = "ap-south-1"  # Replace with your desired region
    log_group_name = "/aws/lambda/prod-fa-payment-init-new"
    # Initialize the CloudWatch Logs client
