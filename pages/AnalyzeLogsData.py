@@ -13,6 +13,7 @@ from langchain.vectorstores import FAISS
 from langchain.llms import OpenAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain.callbacks import get_openai_callback
+from langchain.text_splitter import CharacterTextSplitter
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('openai_key')
@@ -71,37 +72,56 @@ with tab3:
    query = "Anniversary"
 
    result = get_elasticsearch_data(index_name, query)
-   docs = [
-    {"document": {"title": "Document 1", "text": "Content of document 1"}},
-    {"document": {"title": "Document 2", "text": "Content of document 2"}}
-   ]
+   #st.write(result)
+   # docs = [
+   #  {"title1": "Document 1", "text1": "Content of document 1"},
+   #  {"title2": "Document 2", "text2": "Content of document 2"},
+   #  {"title3": "Document 3", "text3": "Content of document 3"},
+   #  {"title4": "Document 4", "text4": "Content of document 4"},
+   #  {"title5": "Document 5", "text5": "Content of document 5"},
+   #  {"title6": "Document 6", "text6": "Content of document 6"}
+   # ]
+    
+   # Convert JSON data to string
+   json_string = json.dumps(result)
+   
+   # split into chunks
+   text_splitter = CharacterTextSplitter(
+    separator="\n",
+    chunk_size=25,
+    chunk_overlap=20,
+    length_function=len
+    )    
+   chunks = text_splitter.split_text(json_string) 
+   #st.write(chunks)
 
-   # embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
-   # knowledge_base = FAISS.from_texts(result, embeddings)
-   #st.write("vector res: "+knowledge_base)
+   embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+   knowledge_base = FAISS.from_texts(chunks, embeddings)
+  
    user_question = st.text_input("Ask a question to your Elastic data:")
    if user_question:
-      # docs = knowledge_base.similarity_search(user_question)
-      # llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
-      # chain = load_qa_chain(llm, chain_type="stuff")
-      # with get_openai_callback() as cb:
-      #    response = chain.run(input_documents=docs, question=user_question)
-      #    st.write(cb)
-      response = openai.Completion.create(
-         engine="davinci",
-         prompt=docs,
-         max_tokens=100,
-         temperature=0.7,
-         n=1,
-         stop=None,
-         documents=len(docs),
-         question=user_question
-      )
+      docs = knowledge_base.similarity_search(user_question)
+      llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
+      chain = load_qa_chain(llm, chain_type="stuff")
+      with get_openai_callback() as cb:
+         response = chain.run(input_documents=docs, question=user_question)
+         st.write(cb)
+      # response = openai.Completion.create(
+      #    engine="davinci",
+      #    prompt=docs,
+      #    max_tokens=100,
+      #    temperature=0.7,
+      #    n=1,
+      #    stop=None,
+      #    documents=len(docs),
+      #    question=user_question
+      # )
 
-      answer = response.choices[0].text.strip()
+      # answer = response.choices[0].text.strip()
 
-      st.write("openai res: "+answer)
+      st.write("openai res: "+response)
    # Process the result
+   
    if result:
       hits = result["hits"]["hits"]
       for hit in hits:

@@ -56,7 +56,7 @@ if pdf is not None:
     length_function=len
     )    
     chunks = text_splitter.split_text(text) 
-        
+    st.write(chunks)
     embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
     knowledge_base = FAISS.from_texts(chunks, embeddings)
     user_question = st.text_input("Ask a question about your PDF:")
