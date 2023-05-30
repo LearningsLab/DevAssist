@@ -78,29 +78,30 @@ with tab1:
       next_token = response.get("nextToken")
       if not next_token or counter >= 10:
          break
-   print(type(log_events),"log_events")
+   #st.write(log_events,"log_events")
    # Print the log events
 
 
    # Concatenate the strings
+   concatenated_text = " "
    for events in log_events:
-      
-      concatenated_text = " ".join(events['message'])
+      concatenated_text += events['message']
       #st.write(concatenated_text)
    #now use the above text to generate embeddings using openai
-      # split into chunks
+   #st.write(concatenated_text)
+   # split into chunks
    text_splitter = CharacterTextSplitter(
     separator="\n",
-    chunk_size=25,
-    chunk_overlap=20,
+    chunk_size=1300,
+    chunk_overlap=1200,
     length_function=len
     )    
    chunks = text_splitter.split_text(concatenated_text) 
-   #st.write(chunks)
+   st.write(chunks,"chunks")
 
    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
    knowledge_base = FAISS.from_texts(chunks, embeddings)
-   user_question = st.text_input("Ask a question to your Elastic data:")
+   user_question = st.text_input("Ask a question to your logs data:")
    if user_question:
       docs = knowledge_base.similarity_search(user_question)
       llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
@@ -108,19 +109,7 @@ with tab1:
       with get_openai_callback() as cb:
          response = chain.run(input_documents=docs, question=user_question)
          st.write(cb)
-      # response = openai.Completion.create(
-      #    engine="davinci",
-      #    prompt=docs,
-      #    max_tokens=100,
-      #    temperature=0.7,
-      #    n=1,
-      #    stop=None,
-      #    documents=len(docs),
-      #    question=user_question
-      # )
-
-      # answer = response.choices[0].text.strip()
-
+    
       st.write("openai res: "+response)
    # Process the result
 with tab2:
@@ -168,16 +157,7 @@ with tab3:
    query = "Anniversary"
 
    result = get_elasticsearch_data(index_name, query)
-   #st.write(result)
-   # docs = [
-   #  {"title1": "Document 1", "text1": "Content of document 1"},
-   #  {"title2": "Document 2", "text2": "Content of document 2"},
-   #  {"title3": "Document 3", "text3": "Content of document 3"},
-   #  {"title4": "Document 4", "text4": "Content of document 4"},
-   #  {"title5": "Document 5", "text5": "Content of document 5"},
-   #  {"title6": "Document 6", "text6": "Content of document 6"}
-   # ]
-    
+   
    # Convert JSON data to string
    json_string = json.dumps(result)
    
@@ -189,7 +169,7 @@ with tab3:
     length_function=len
     )    
    chunks = text_splitter.split_text(json_string) 
-   #st.write(chunks)
+   st.write(chunks)
 
    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
    knowledge_base = FAISS.from_texts(chunks, embeddings)
@@ -202,19 +182,7 @@ with tab3:
       with get_openai_callback() as cb:
          response = chain.run(input_documents=docs, question=user_question)
          st.write(cb)
-      # response = openai.Completion.create(
-      #    engine="davinci",
-      #    prompt=docs,
-      #    max_tokens=100,
-      #    temperature=0.7,
-      #    n=1,
-      #    stop=None,
-      #    documents=len(docs),
-      #    question=user_question
-      # )
-
-      # answer = response.choices[0].text.strip()
-
+     
       st.write("openai res: "+response)
    # Process the result
    
