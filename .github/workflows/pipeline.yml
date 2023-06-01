@@ -1,0 +1,20 @@
+name: ECS Jenkin Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch you want to trigger the pipeline from
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Trigger Jenkins Pipeline
+      env:
+        JENKINS_API_TOKEN: ${{ secrets.JENKINS_TOKEN }}
+      run: |
+        curl -X POST \
+          -u "${{ secrets.JENKINS_TOKEN }}": \
+          "http://172.31.11.57:8080/job/AWSECSPIPELINE/build"
+
