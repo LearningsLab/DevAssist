@@ -27,8 +27,8 @@ tab1, tab2, tab3 = st.tabs(["Cloudwatch", "OpenSearch", "ElasticSearch"])
 with tab1:
    import boto3
    # Configure AWS credentials and region
-   aws_access_key_id = "AKIAUTH5FOVEGBBWCJT4"
-   aws_secret_access_key = "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"
+   aws_access_key_id = os.getenv('aws_access_key_id')
+   aws_secret_access_key = os.getenv('aws_secret_access_key')
    region_name = "ap-south-1"  # Replace with your desired region
    log_group_name = "/aws/lambda/prod-fa-payment-init-new"
    # Initialize the CloudWatch Logs client
@@ -93,7 +93,7 @@ with tab1:
    text_splitter = CharacterTextSplitter(
     separator="\n",
     chunk_size=1300,
-    chunk_overlap=1200,
+    chunk_overlap=100,
     length_function=len
     )    
    chunks = text_splitter.split_text(concatenated_text) 
@@ -185,12 +185,5 @@ with tab3:
      
       st.write("openai res: "+response)
    # Process the result
-   
-   if result:
-      hits = result["hits"]["hits"]
-      for hit in hits:
-         source = hit["_source"]
-         #st.write(source)
-   else:
-      st.write("Failed to retrieve data from Elasticsearch.")
+
 
