@@ -16,5 +16,5 @@ jobs:
       run: |
         curl -X POST \
           -u "${{ secrets.JENKINS_TOKEN }}": \
-          "http://172.31.11.57:8080/job/AWS%20ECS%20PIPELINE/build"
+          "http://172.31.11.57:8080/job/AWS-ECS-PIPELINE/build"
 
