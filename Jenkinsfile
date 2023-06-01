@@ -5,7 +5,7 @@ pipeline {
             steps {
                     sh ''' #!/bin/sh
 
-   ssh root@172.31.19.60 "docker-compose -f /home/ubuntu/code_repo/streamlit/docker-compose build"
+   ssh root@172.31.19.60 "docker-compose -f /home/ubuntu/code_repo/streamlit/docker-compose.yml build"
  
          '''
                 }
