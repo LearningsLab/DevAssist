@@ -17,5 +17,5 @@ class TextChunkSplitterService:
         chunk_overlap=200,
         length_function=len
         )
-        chunks = text_splitter.split(text)
+        chunks = text_splitter.split_text(text)
         return chunks

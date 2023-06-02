@@ -1,21 +1,17 @@
 from dotenv import load_dotenv
-import chunk
 import streamlit as st
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
-from langchain.callbacks import get_openai_callback
 from langchain import OpenAI, SQLDatabase, SQLDatabaseChain
 import psycopg2
 import openai
-import os
+from services.GetEnvironmentVariables import GetEnvVariables
 
 load_dotenv()
 st.set_page_config(page_title="Ask your Database")
 st.header("Ask your Database and get Insights!! 💬")
-OPENAI_API_KEY = os.getenv('openai_key')
+
+env_vars = GetEnvVariables()
+OPENAI_API_KEY = env_vars.get_env_variable('openai_key')
 openai.api_key=OPENAI_API_KEY
 
 conn = ''
@@ -25,7 +21,7 @@ with st.form("my_form"):
    all_db_types = ["Mysql","Postgres","MongoDB"]
    db_type    = st.selectbox("Select DB Type",all_db_types)
    dbusername = st.text_input("select db username")
-   dbpassword = st.text_input("select db password")
+   dbpassword = st.text_input("select db password",type="password")
    dbname     = st.text_input("select db name")
    dbhost     = st.text_input("select db host")
 
@@ -56,7 +52,6 @@ with st.form("my_form"):
             if user_question!='':
                 st.write(db_chain.run(user_question))
 
-st.write("Outside the form")
    
 
 #st.write(db)
