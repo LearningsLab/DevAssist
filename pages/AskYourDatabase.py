@@ -6,7 +6,6 @@ import psycopg2
 import openai
 from services.GetEnvironmentVariables import GetEnvVariables
 
-load_dotenv()
 st.set_page_config(page_title="Ask your Database")
 st.header("Ask your Database and get Insights!! 💬")
 

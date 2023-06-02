@@ -1,23 +1,18 @@
 import streamlit as st
-from dotenv import load_dotenv
-import time
-import numpy as np
-from PIL import Image
-from langchain import ElasticVectorSearch
 from langchain.embeddings import OpenAIEmbeddings
 import openai
-import os
 import requests
 import json
 from langchain.vectorstores import FAISS
 from langchain.llms import OpenAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain.callbacks import get_openai_callback
-from langchain.text_splitter import CharacterTextSplitter
+from services.GetEnvironmentVariables import GetEnvVariables
+from services.TextChunkSplitterService import TextChunkSplitterService
 
-
-load_dotenv()
-OPENAI_API_KEY = os.getenv('openai_key')
+# get env variables 
+env_vars = GetEnvVariables()
+OPENAI_API_KEY = env_vars.get_env_variable('openai_key')
 openai.api_key=OPENAI_API_KEY
 
 st.set_page_config(page_title="Analyze Logs Data", page_icon="📈")
@@ -27,8 +22,8 @@ tab1, tab2, tab3 = st.tabs(["Cloudwatch", "OpenSearch", "ElasticSearch"])
 with tab1:
    import boto3
    # Configure AWS credentials and region
-   aws_access_key_id = os.getenv('aws_access_key_id')
-   aws_secret_access_key = os.getenv('aws_secret_access_key')
+   aws_access_key_id = env_vars.get_env_variable('aws_access_key_id')
+   aws_secret_access_key = env_vars.get_env_variable('aws_secret_access_key')
    region_name = "ap-south-1"  # Replace with your desired region
    log_group_name = "/aws/lambda/prod-fa-payment-init-new"
    # Initialize the CloudWatch Logs client
@@ -87,18 +82,13 @@ with tab1:
    for events in log_events:
       concatenated_text += events['message']
       #st.write(concatenated_text)
-   #now use the above text to generate embeddings using openai
-   #st.write(concatenated_text)
+   
    # split into chunks
-   text_splitter = CharacterTextSplitter(
-    separator="\n",
-    chunk_size=1300,
-    chunk_overlap=100,
-    length_function=len
-    )    
-   chunks = text_splitter.split_text(concatenated_text) 
+   splitters = TextChunkSplitterService('/n',250,200,len)
+   chunks = splitters.split_text(concatenated_text)
    st.write(chunks,"chunks")
-
+   
+   #now use the above text to generate embeddings using openai
    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
    knowledge_base = FAISS.from_texts(chunks, embeddings)
    user_question = st.text_input("Ask a question to your logs data:")
@@ -112,6 +102,7 @@ with tab1:
     
       st.write("openai res: "+response)
    # Process the result
+
 with tab2:
    st.header("OpenSearch logs")
    st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
@@ -150,9 +141,7 @@ with tab3:
          # Handle the error case
          st.write(f"Error: {response.status_code}")
          return None
-
       
-   # Example usage
    index_name = "giftfinder_node"
    query = "Anniversary"
 
@@ -162,13 +151,8 @@ with tab3:
    json_string = json.dumps(result)
    
    # split into chunks
-   text_splitter = CharacterTextSplitter(
-    separator="\n",
-    chunk_size=25,
-    chunk_overlap=20,
-    length_function=len
-    )    
-   chunks = text_splitter.split_text(json_string) 
+   splitters = TextChunkSplitterService('/n',250,200,len)
+   chunks = splitters.split_text(json_string)
    st.write(chunks)
 
    embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
