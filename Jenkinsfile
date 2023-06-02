@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('docker build image') {
             steps {
-                    sh ''' #!/bin/sh
+                sh ''' #!/bin/sh
    now=$(date +%d%m%y_%I%M)
 
    ssh root@172.31.19.60 "docker-compose -f /home/ubuntu/code_repo/streamlit/docker-compose.yml build"
@@ -15,8 +15,7 @@ pipeline {
         
         
         stage('Push docker image') {
-            steps {
-                script {                 
+            steps {           
                 sh ''' #!/bin/sh
    now=$(date +%d%m%y_%I%M)
 
@@ -25,14 +24,13 @@ pipeline {
    ssh root@172.31.19.60 "docker push 316211033416.dkr.ecr.ap-south-1.amazonaws.com/streamlit:${now}"
  
          '''          
-                }
             }
         }
 
 
         stage('New Task Revision') {
             steps {
- sh ''' #!/bin/sh
+               sh ''' #!/bin/sh
 
    latest_tag=$(aws ecr describe-images --repository-name streamlit --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' --output text)
 
@@ -51,7 +49,7 @@ pipeline {
  
       stage('Update Cluster Service') {
             steps {
- sh ''' #!/bin/sh
+               sh ''' #!/bin/sh
   aws ecs update-service --cluster fa-testdatasights --service DatawebApp2 --region ap-south-1 --task-definition fa-testdatasights2 --desired-count 1 --force-new-deployment
 '''
                 }
