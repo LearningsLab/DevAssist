@@ -38,7 +38,7 @@ pipeline {
                sh ''' #!/bin/sh
    aws ecs register-task-definition \
              --family fa-testdatasights2 \
-             --container-definitions '[{"name": "fa-testdatasights2", "image": "316211033416.dkr.ecr.ap-south-1.amazonaws.com/streamlit:'${latest_tag}'", 
+             --container-definitions '[{"name": "fa-testdatasights2", "image": "316211033416.dkr.ecr.ap-south-1.amazonaws.com/streamlit:'${gitCommitId}'", 
      "portMappings": [ {"containerPort": 8501, "hostPort": 8501, "protocol": "tcp"} ]}]' \
              --requires-compatibilities FARGATE \
              --network-mode awsvpc \
