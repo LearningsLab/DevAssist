@@ -36,9 +36,6 @@ pipeline {
         stage('New Task Revision') {
             steps {
                sh ''' #!/bin/sh
-
-   ####latest_tag=$(aws ecr describe-images --repository-name streamlit --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' --output text)
-       latest_tag=$(date +%d%m%y_%I%M)
    aws ecs register-task-definition \
              --family fa-testdatasights2 \
              --container-definitions '[{"name": "fa-testdatasights2", "image": "316211033416.dkr.ecr.ap-south-1.amazonaws.com/streamlit:'${latest_tag}'", 
