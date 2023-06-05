@@ -9,6 +9,7 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.callbacks import get_openai_callback
 from services.GetEnvironmentVariables import GetEnvVariables
 from services.TextChunkSplitterService import TextChunkSplitterService
+from services.CreateEmbeddingService import CreateEmbeddingService
 
 # get env variables 
 env_vars = GetEnvVariables()
@@ -68,14 +69,12 @@ with tab1:
          params["nextToken"] = next_token
       response = client.get_log_events(**params)
       events = response["events"]
-      #print('events',events,response)
+      print('events',events,response)
       log_events.extend(events)
       next_token = response.get("nextToken")
       if not next_token or counter >= 10:
          break
-   #st.write(log_events,"log_events")
-   # Print the log events
-
+   
 
    # Concatenate the strings
    concatenated_text = " "
@@ -83,25 +82,30 @@ with tab1:
       concatenated_text += events['message']
       #st.write(concatenated_text)
    
-   # split into chunks
-   splitters = TextChunkSplitterService('/n',250,200,len)
-   chunks = splitters.split_text(concatenated_text)
-   st.write(chunks,"chunks")
-   
-   #now use the above text to generate embeddings using openai
-   embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
-   knowledge_base = FAISS.from_texts(chunks, embeddings)
-   user_question = st.text_input("Ask a question to your logs data:")
-   if user_question:
-      docs = knowledge_base.similarity_search(user_question)
-      llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
-      chain = load_qa_chain(llm, chain_type="stuff")
-      with get_openai_callback() as cb:
-         response = chain.run(input_documents=docs, question=user_question)
-         st.write(cb)
-    
-      st.write("openai res: "+response)
-   # Process the result
+   if(concatenated_text!=" "):
+      # split into chunks
+      splitters = TextChunkSplitterService('/n',250,200,len)
+      chunks = splitters.split_text(concatenated_text)
+      st.write(chunks,"chunks")
+      
+      # create embeddings
+      embeddingsIni = CreateEmbeddingService()
+      embeddings = embeddingsIni.create_embeddings('OpenEmbeddings')
+      
+      knowledge_base = FAISS.from_texts(chunks, embeddings)
+
+      user_question = st.text_input("Ask a question to your logs data:")
+      if user_question:
+         docs = knowledge_base.similarity_search(user_question)
+         llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
+         chain = load_qa_chain(llm, chain_type="stuff")
+         with get_openai_callback() as cb:
+            response = chain.run(input_documents=docs, question=user_question)
+            st.write(cb)
+      
+         st.write("openai res: "+response)
+   else :
+      st.write("No data available")
 
 with tab2:
    st.header("OpenSearch logs")
@@ -155,7 +159,10 @@ with tab3:
    chunks = splitters.split_text(json_string)
    st.write(chunks)
 
-   embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
+   # create embeddings
+   embeddingsIni = CreateEmbeddingService()
+   embeddings = embeddingsIni.create_embeddings('OpenEmbeddings')
+   
    knowledge_base = FAISS.from_texts(chunks, embeddings)
   
    user_question = st.text_input("Ask a question to your Elastic data:")
