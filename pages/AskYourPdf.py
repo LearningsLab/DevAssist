@@ -36,6 +36,7 @@ if pdf is not None:
     
     # create indexing
     knowledge_base = FAISS.from_texts(chunks, embeddings)
+    
     user_question = st.text_input("Ask a question about your PDF:")
     if user_question:
         docs = knowledge_base.similarity_search(user_question)
