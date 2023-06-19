@@ -116,8 +116,8 @@ with tab3:
   
    def get_elasticsearch_data(index_name, query):
       # Elasticsearch endpoint
-      url = f"http://vpc-similar-product-pwanh5zsjbcnorrre77cazmfce.ap-south-1.es.amazonaws.com/{index_name}/_search"
-      
+      #url = f"http://vpc-similar-product-pwanh5zsjbcnorrre77cazmfce.ap-south-1.es.amazonaws.com/{index_name}/_search"
+      url =f"https://search-logs-71-65vca3dfvyuy76y5fcqu53tw6q.ap-south-1.es.amazonaws.com/{index_name}/_search"
       # Request headers
       headers = {
          "Content-Type": "application/json"
@@ -125,12 +125,10 @@ with tab3:
       
       # Request body
       body = {
-         "query": {
-            "match": {
-                  "occasion": query
+               "query": {
+                  "match_all": {}
+               }
             }
-         }
-      }
       
       # Send the request
       response = requests.get(url, headers=headers, json=body)
@@ -140,29 +138,33 @@ with tab3:
          # Parse and process the response data
          response_data = response.json()
          # Handle the retrieved data according to your needs
-         return response_data
+         return response_data['hits']['hits']
       else:
          # Handle the error case
          st.write(f"Error: {response.status_code}")
          return None
       
-   index_name = "giftfinder_node"
+   index_name = "logstash-apis"
    query = "Anniversary"
 
    result = get_elasticsearch_data(index_name, query)
-   
+   st.write(result)
+
    # Convert JSON data to string
-   json_string = json.dumps(result)
-   
+   #json_string = json.dumps(result)
+   json_string = ''
+   for key in result:
+        json_string += key['_source']['message']
    # split into chunks
-   splitters = TextChunkSplitterService('/n',250,200,len)
+   splitters = TextChunkSplitterService('Production.INFO',250,200,len)
    chunks = splitters.split_text(json_string)
    st.write(chunks)
 
+   #exit()
    # create embeddings
    embeddingsIni = CreateEmbeddingService()
    embeddings = embeddingsIni.create_embeddings('OpenEmbeddings')
-   
+   print(embeddings)
    knowledge_base = FAISS.from_texts(chunks, embeddings)
   
    user_question = st.text_input("Ask a question to your Elastic data:")
