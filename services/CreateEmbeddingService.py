@@ -34,7 +34,7 @@ class EmbeddingModelFactory:
     def get_embedding_model(self, embedding_model_name):
         # Logic to create the embedding model object
         if embedding_model_name == "OpenEmbeddings":
-            embedding_model = OpenAIEmbeddings()
+            embedding_model = OpenAIEmbeddings(model="gpt-3.5-turbo")
             return embedding_model
         elif embedding_model_name == "BertUncased":
             embedding_model = transformers.AutoModel.from_pretrained("bert-base-uncased")
