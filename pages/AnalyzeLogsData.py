@@ -10,7 +10,7 @@ from langchain.callbacks import get_openai_callback
 from services.GetEnvironmentVariables import GetEnvVariables
 from services.TextChunkSplitterService import TextChunkSplitterService
 from services.CreateEmbeddingService import CreateEmbeddingService
-
+import re
 # get env variables 
 env_vars = GetEnvVariables()
 OPENAI_API_KEY = env_vars.get_env_variable('openai_key')
@@ -69,7 +69,7 @@ with tab1:
          params["nextToken"] = next_token
       response = client.get_log_events(**params)
       events = response["events"]
-      print('events',events,response)
+      #print('events',events,response)
       log_events.extend(events)
       next_token = response.get("nextToken")
       if not next_token or counter >= 10:
@@ -116,8 +116,8 @@ with tab3:
   
    def get_elasticsearch_data(index_name, query):
       # Elasticsearch endpoint
-      url = f"http://vpc-similar-product-pwanh5zsjbcnorrre77cazmfce.ap-south-1.es.amazonaws.com/{index_name}/_search"
-      
+      #url = f"http://vpc-similar-product-pwanh5zsjbcnorrre77cazmfce.ap-south-1.es.amazonaws.com/{index_name}/_search"
+      url =f"https://search-logs-71-65vca3dfvyuy76y5fcqu53tw6q.ap-south-1.es.amazonaws.com/{index_name}/_search"
       # Request headers
       headers = {
          "Content-Type": "application/json"
@@ -125,12 +125,11 @@ with tab3:
       
       # Request body
       body = {
-         "query": {
-            "match": {
-                  "occasion": query
+               "query": {
+                  "match_all": {}
+               },
+               "size": 25
             }
-         }
-      }
       
       # Send the request
       response = requests.get(url, headers=headers, json=body)
@@ -139,30 +138,39 @@ with tab3:
       if response.status_code == 200:
          # Parse and process the response data
          response_data = response.json()
+         st.write(response_data)
          # Handle the retrieved data according to your needs
-         return response_data
+         return response_data['hits']['hits']
       else:
          # Handle the error case
          st.write(f"Error: {response.status_code}")
          return None
       
-   index_name = "giftfinder_node"
+   index_name = "logstash-apis"
    query = "Anniversary"
 
    result = get_elasticsearch_data(index_name, query)
-   
-   # Convert JSON data to string
-   json_string = json.dumps(result)
-   
-   # split into chunks
-   splitters = TextChunkSplitterService('/n',250,200,len)
-   chunks = splitters.split_text(json_string)
-   st.write(chunks)
+   #st.write(result)
 
+   # Convert JSON data to string
+   #json_string = json.dumps(result)
+   json_string = ''
+   pattern = r"\[.*?\] Production\.INFO: "
+
+   for key in result:
+      json_string += re.sub(pattern, "", key['_source']['message'])+"separator "
+   
+   # print context
+   #st.write('context', json_string)
+   # split into chunks
+   splitters = TextChunkSplitterService('separator',2500,200,len)
+   chunks = splitters.split_text(json_string)
+   st.write("chunks", chunks)
+
+   #exit()
    # create embeddings
    embeddingsIni = CreateEmbeddingService()
    embeddings = embeddingsIni.create_embeddings('OpenEmbeddings')
-   
    knowledge_base = FAISS.from_texts(chunks, embeddings)
   
    user_question = st.text_input("Ask a question to your Elastic data:")

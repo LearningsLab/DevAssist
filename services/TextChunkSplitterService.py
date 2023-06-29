@@ -12,9 +12,9 @@ class TextChunkSplitterService:
         # Split the text into chunks of specified length
         # and return the list of chunks
         text_splitter = CharacterTextSplitter(
-        separator="\n",
-        chunk_size=250,
-        chunk_overlap=200,
+        separator=self.separator,
+        chunk_size=self.chunk_size,
+        chunk_overlap=self.chunk_overlap,
         length_function=len
         )
         chunks = text_splitter.split_text(text)
