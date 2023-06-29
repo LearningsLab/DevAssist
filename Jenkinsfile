@@ -11,7 +11,7 @@ pipeline {
             steps {
                 sh ''' #!/bin/sh
    
-   ssh root@172.31.19.60 "docker-compose -f /home/ubuntu/code_repo/streamlit/docker-compose.yml build"
+   ssh root@172.31.19.60 "docker-compose -f /root/DevAssist-main/docker-compose.yml build"
    
    ssh root@172.31.19.60 "docker tag 316211033416.dkr.ecr.ap-south-1.amazonaws.com/streamlit:latest  316211033416.dkr.ecr.ap-south-1.amazonaws.com/streamlit:${gitCommitId}"
          '''
