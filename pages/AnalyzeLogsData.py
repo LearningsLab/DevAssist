@@ -133,12 +133,12 @@ with tab3:
       
       # Send the request
       response = requests.get(url, headers=headers, json=body)
-      
+      st.write(response)
       # Check the response status
       if response.status_code == 200:
          # Parse and process the response data
          response_data = response.json()
-         st.write(response_data)
+         #st.write(response_data)
          # Handle the retrieved data according to your needs
          return response_data['hits']['hits']
       else:
