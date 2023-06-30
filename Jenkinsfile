@@ -7,6 +7,17 @@ pipeline {
     }
     
    stages {
+        stage('Git Pull Repo') {
+            steps {
+                withCredentials([gitUsernamePassword(credentialsId: 'gitaccess', gitToolName: 'git')]) {
+                     sh ''' #!/bin/sh                
+                        ssh root@172.31.19.60 "cd /root/DevAssist && git pull origin main"     
+                      '''
+                }
+            }
+        }
+
+
         stage('docker build image') {
             steps {
                 sh ''' #!/bin/sh
