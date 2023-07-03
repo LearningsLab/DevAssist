@@ -12,3 +12,4 @@ python-dotenv==1.0.0
 tiktoken==0.4.0
 boto3==1.26.142
 faiss-cpu==1.7.4
+PyMySQL==1.0.3
