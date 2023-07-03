@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import streamlit as st
 from langchain.llms import OpenAI
 from langchain import OpenAI, SQLDatabase, SQLDatabaseChain
-import psycopg2
+#import psycopg2
 import openai
 from services.GetEnvironmentVariables import GetEnvVariables
 
